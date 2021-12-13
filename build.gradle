@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+group 'me.vadim.app'
+version '1.0.0'
+
+def name = project.name + '.jar'
+def main = group + '.Main'
+
+project.buildDir project.projectDir.path + '/target'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+}
+
+shadowJar {
+    archiveFileName.set(name)
+    destinationDirectory.set(project.buildDir)
+    mergeServiceFiles()
+    minimize()
+    manifest {
+        attributes('Main-Class': main)
+    }
+}
+
+build {
+    dependsOn(shadowJar)
+}
+
+compileJava {
+    options.compilerArgs
+            << '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED'
+            << '--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED'
+            << '--add-opens=java.desktop/java.awt=ALL-UNNAMED'
+            << '--add-exports=java.desktop/java.awt=ALL-UNNAMED'
+            << '--add-opens=java.desktop/sun.java2d.pipe.hw=ALL-UNNAMED'
+            << '--add-exports=java.desktop/sun.java2d.pipe.hw=ALL-UNNAMED'
+}
+
+jar {
+    destinationDirectory.set(project.buildDir)
+    archiveFileName.set(project.name + '-' + project.version + '-unshaded.jar')
+}
